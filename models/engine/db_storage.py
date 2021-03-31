@@ -29,7 +29,7 @@ class DBStorage:
                                       pool_pre_ping=True)
 
         if os.getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(self.engine)
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
