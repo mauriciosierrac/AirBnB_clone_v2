@@ -1,34 +1,59 @@
 #!/usr/bin/python3
 """ """
+import os
 from tests.test_models.test_base_model import test_basemodel
 from models.user import User
-
+from models.engine.file_storage import FileStorage
+from datetime import datetime
 
 class test_User(test_basemodel):
     """ """
 
-    def __init__(self, *args, **kwargs):
+    @classmethod
+    def setUpClass(cls):
         """ """
-        super().__init__(*args, **kwargs)
-        self.name = "User"
-        self.value = User
+        try:
+            os.rename("file.json", "tmp")
+        except IOError:
+            pass
+        FileStorage._FileStorage__objects = {}
+        cls.user = User(email="lann@houselannister.com", password="revelc")
+        cls.filestorage = FileStorage()
 
-    def test_first_name(self):
+    @classmethod
+    def tearDownClass(cls):
         """ """
-        new = self.value()
-        self.assertEqual(type(new.first_name), str)
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("tmp", "file.json")
+        except IOError:
+            pass
+        del cls.user
+        del cls.filestorage
 
-    def test_last_name(self):
+    def test_attributes(self):
         """ """
-        new = self.value()
-        self.assertEqual(type(new.last_name), str)
+        i = User()
+        self.assertEqual(str, type(i.id))
+        self.assertEqual(datetime, type(i.created_at))
+        self.assertEqual(datetime, type(i.updated_at))
+        self.assertTrue(hasattr(i, "__tablename__"))
+        self.assertTrue(hasattr(i, "email"))
+        self.assertTrue(hasattr(i, "password"))
+        self.assertTrue(hasattr(i, "first_name"))
+        self.assertTrue(hasattr(i, "last_name"))
 
-    def test_email(self):
+    def test_str(self):
         """ """
-        new = self.value()
-        self.assertEqual(type(new.email), str)
-
-    def test_password(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.password), str)
+        i = self.user.__str__()
+        self.assertIn("[User] ({})".format(self.user.id), i)
+        self.assertIn("'id': '{}'".format(self.user.id), i)
+        self.assertIn("'created_at': {}".format(
+            repr(self.user.created_at)), i)
+        self.assertIn("'updated_at': {}".format(
+            repr(self.user.updated_at)), i)
+        self.assertIn("'email': '{}'".format(self.user.email), i)
+        self.assertIn("'password': '{}'".format(self.user.password), i)

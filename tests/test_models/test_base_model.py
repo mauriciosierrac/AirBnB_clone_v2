@@ -6,6 +6,7 @@ import datetime
 from uuid import UUID
 import json
 import os
+from models.engine.file_storage import FileStorage
 
 
 class test_basemodel(unittest.TestCase):
@@ -17,15 +18,30 @@ class test_basemodel(unittest.TestCase):
         self.name = 'BaseModel'
         self.value = BaseModel
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         """ """
-        pass
-
-    def tearDown(self):
         try:
-            os.remove('file.json')
-        except:
+            os.rename("file.json", "tmp")
+        except IOError:
             pass
+        FileStorage._FileStorage__objects = {}
+        cls.storage = FileStorage()
+        cls.base = BaseModel()
+
+    @classmethod
+    def tearDownClass(cls):
+        """ """
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("tmp", "file.json")
+        except IOError:
+            pass
+        del cls.storage
+        del cls.base
 
     def test_default(self):
         """ """
@@ -58,9 +74,11 @@ class test_basemodel(unittest.TestCase):
 
     def test_str(self):
         """ """
-        i = self.value()
-        self.assertEqual(str(i), '[{}] ({}) {}'.format(self.name, i.id,
-                         i.__dict__))
+        s = self.base.__str__()
+        self.assertIn("[BaseModel] ({})".format(self.base.id), s)
+        self.assertIn("'id': '{}'".format(self.base.id), s)
+        self.assertIn("'created_at': {}".format(repr(self.base.created_at)), s)
+        self.assertIn("'updated_at': {}".format(repr(self.base.updated_at)), s)
 
     def test_todict(self):
         """ """
@@ -72,12 +90,6 @@ class test_basemodel(unittest.TestCase):
         """ """
         n = {None: None}
         with self.assertRaises(TypeError):
-            new = self.value(**n)
-
-    def test_kwargs_one(self):
-        """ """
-        n = {'Name': 'test'}
-        with self.assertRaises(KeyError):
             new = self.value(**n)
 
     def test_id(self):
@@ -94,6 +106,5 @@ class test_basemodel(unittest.TestCase):
         """ """
         new = self.value()
         self.assertEqual(type(new.updated_at), datetime.datetime)
-        n = new.to_dict()
-        new = BaseModel(**n)
+        new.save()
         self.assertFalse(new.created_at == new.updated_at)
