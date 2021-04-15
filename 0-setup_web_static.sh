@@ -7,21 +7,21 @@ sudo apt-get install -y upgrade
 sudo apt-get install -y ngingx
 
 # verify if a dir exists
-sudo mkdir -p ./data
-sudo mkdir -p ./data/web_static/
-sudo mkdir -p ./data/web_static/releases/
-sudo mkdir -p ./data/web_static/shared/
-sudo mkdir -p ./data/web_static/releases/test/
+sudo mkdir -p /data
+sudo mkdir -p /data/web_static/
+sudo mkdir -p /data/web_static/releases/
+sudo mkdir -p /data/web_static/shared/
+sudo mkdir -p /data/web_static/releases/test/
 
 # create a fake HTML file
 echo 'Holberton School' >> /data/web_static/releases/test/index.html
 
 # create a simbolic link, if exist are deleted and recreated ever time the script is ran
-rm ./data/web_static/*
-ln -s ./data/web_static/releases/test/ ./data/web_static/current
+rm /data/web_static/*
+ln -s /data/web_static/releases/test/ /data/web_static/current
 
 # asigned ubuntu owner to data dir
-sudo chown -R ubuntu:ubuntu ./data/
+sudo chown -R ubuntu:ubuntu /data/
 
 # update Nginx configuration to serve the content hbnb_Static
 echo "server {
