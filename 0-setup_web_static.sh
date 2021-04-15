@@ -2,26 +2,30 @@
 # this script install Ngingx Service and verify if exist some dir and create
 
 # update dependencies and install Nginx service
-sudo apt-get install -y update
-sudo apt-get install -y upgrade
+sudo apt-get -y update
+sudo apt-get -y upgrade
 sudo apt-get install -y nginx
 
 # verify if a dir exists
-sudo mkdir -p /data
-sudo mkdir -p /data/web_static/
-sudo mkdir -p /data/web_static/releases/
 sudo mkdir -p /data/web_static/shared/
 sudo mkdir -p /data/web_static/releases/test/
 
 # create a fake HTML file
-echo 'Holberton School' >> /data/web_static/releases/test/index.html
+echo '<html>
+  <head>
+  </head>
+  <body>
+    Holberton School
+  </body>
+</html>' > /data/web_static/releases/test/index.html
 
 # create a simbolic link, if exist are deleted and recreated ever time the script is ran
-rm /data/web_static/*
+rm /data/web_static/current
+
 ln -sf  /data/web_static/releases/test/ /data/web_static/current
 
 # asigned ubuntu owner to data dir
-sudo chown -R ubuntu:ubuntu /data/
+sudo chown -R ubuntu:ubuntu /data
 
 # update Nginx configuration to serve the content hbnb_Static
 echo "server {
@@ -42,7 +46,7 @@ echo "server {
       root /var/www/html;
       internal;
     }
-}" >> /etc/nginx/sites-available/default
+}" > /etc/nginx/sites-available/default
 
 # restart Nginx service
 sudo service nginx restart
