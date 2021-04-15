@@ -46,6 +46,3 @@ echo "server {
 
 # restart Nginx service
 sudo service ngingx restart
-
-
-
