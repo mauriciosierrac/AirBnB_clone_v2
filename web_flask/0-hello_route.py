@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+''' this app run the serve and print hello HBNH'''
 
 from flask import Flask
 
@@ -9,6 +10,7 @@ app.url_map.strict_slashes = False
 
 @app.route('/')
 def hello_route():
+    ''' print a hello page '''
     return 'Hello HBNB!'
 
 
